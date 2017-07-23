@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CHAPTERS=72
-
+OUTNAME="mol.epub"
 
 # create source dir if it doesn't exit
 if [[ ! -e source ]]; then
@@ -51,5 +51,25 @@ do
     fi
 done
 
+# create cleanmd dir if it doesn't exit
+if [[ ! -e cleanmd ]]; then
+	mkdir cleanmd
+fi
+
+# remove div tags
+for x in `seq $CHAPTERS`
+do
+	padded=`printf '%03d' $x`
+	input="markdown/$x.md"
+	output="cleanmd/$padded.md"
+    if [[ ! -e $output ]]; then
+        echo "cleaning markdown: Chapter $x"
+        grep -v '<' $input > $output
+    fi
+done
 
 
+echo 'building epub...'
+set -x
+pandoc -S -o $OUTNAME title.txt `ls cleanmd/*md | sort -n`
+set +x
