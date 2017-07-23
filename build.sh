@@ -6,7 +6,7 @@ CHAPTERS=72
 # create source dir if it doesn't exit
 if [[ ! -e source ]]; then
 	mkdir source
-fi	
+fi
 
 # check for undownloaded chapters
 for x in `seq $CHAPTERS`
@@ -22,7 +22,7 @@ done
 # create stripped dir if it doesn't exit
 if [[ ! -e stripped ]]; then
 	mkdir stripped
-fi	
+fi
 
 # strip headers and footers
 for x in `seq $CHAPTERS`
@@ -34,3 +34,22 @@ do
         grep "div class='storytext" $input > $output
     fi
 done
+
+# create markdown dir if it doesn't exit
+if [[ ! -e markdown ]]; then
+	mkdir markdown
+fi
+
+# reformat to markdown
+for x in `seq $CHAPTERS`
+do
+	input="stripped/$x.html"
+	output="markdown/$x.md"
+    if [[ ! -e $output ]]; then
+        echo "converting to markdown: Chapter $x"
+        pandoc $input -f html -t markdown -o $output
+    fi
+done
+
+
+
