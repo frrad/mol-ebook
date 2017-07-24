@@ -64,12 +64,11 @@ do
 	output="cleanmd/$padded.md"
     if [[ ! -e $output ]]; then
         echo "cleaning markdown: Chapter $x"
-        grep -v '<' $input > $output
+        grep -v '<' $input | sed 's/\*\*\(Chapter [0-9]*\)\*\*/#\1/' > $output
     fi
 done
 
 
 echo 'building epub...'
-set -x
-pandoc -S -o $OUTNAME title.txt `ls cleanmd/*md | sort -n`
-set +x
+pandoc -S -o --toc $OUTNAME title.txt `ls cleanmd/*md | sort -n`
+
