@@ -70,5 +70,7 @@ done
 
 
 echo 'building epub...'
-pandoc -S -o --toc $OUTNAME title.txt `ls cleanmd/*md | sort -n`
+pandoc -S -o $OUTNAME title.txt `ls cleanmd/*md | sort -n` --toc
 
+echo 'building mobi...'
+kindlegen $OUTNAME
