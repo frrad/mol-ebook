@@ -11,8 +11,8 @@ fi
 # check for undownloaded chapters
 for x in `seq $CHAPTERS`
 do
-	filename="source/$x"
-	url="https://www.fictionpress.com/s/2961893/$x"
+    filename="source/$x"
+    url="https://www.fictionpress.com/s/2961893/$x"
     if [[ ! -e $filename ]]; then
         echo "Downloading Chapter $x"
 		curl -o $filename $url
@@ -27,8 +27,8 @@ fi
 # strip headers and footers
 for x in `seq $CHAPTERS`
 do
-	input="source/$x"
-	output="stripped/$x.html"
+    input="source/$x"
+    output="stripped/$x.html"
     if [[ ! -e $output ]]; then
         echo "stripping headers/footers: Chapter $x"
         grep "div class='storytext" $input > $output
@@ -43,8 +43,8 @@ fi
 # reformat to markdown
 for x in `seq $CHAPTERS`
 do
-	input="stripped/$x.html"
-	output="markdown/$x.md"
+    input="stripped/$x.html"
+    output="markdown/$x.md"
     if [[ ! -e $output ]]; then
         echo "converting to markdown: Chapter $x"
         pandoc $input -f html -t markdown -o $output
@@ -59,9 +59,9 @@ fi
 # remove div tags
 for x in `seq $CHAPTERS`
 do
-	padded=`printf '%03d' $x`
-	input="markdown/$x.md"
-	output="cleanmd/$padded.md"
+    padded=`printf '%03d' $x`
+    input="markdown/$x.md"
+    output="cleanmd/$padded.md"
     if [[ ! -e $output ]]; then
         echo "cleaning markdown: Chapter $x"
         grep -v '<' $input | sed 's/\*\*\(Chapter [0-9]*\)\*\*/#\1/' > $output
