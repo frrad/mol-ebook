@@ -2,7 +2,7 @@
 
 OUTNAME="mol.epub"
 
-CHAPTERS=`curl -s https://www.fictionpress.com/s/2961893 | grep 'option  value' | sed 's/option  value.\([0-9]*\)/xxxxx\1xxxxx\n/g' | grep -o 'xxxxx.*xxxxx' | sed 's/xxxxx\([0-9]*\)xxxxx/\1/' | sort -u -n | tail -n 1`
+CHAPTERS=`curl -s https://www.fictionpress.com/s/2961893 | grep -o 'option  value=[0-9]*' | sed 's/^.*value=\([0-9]*\)*[^0-9]*$/\1/' | sort -unr | head -n 1`
 
 echo $CHAPTERS > numchapters
 
