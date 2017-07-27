@@ -1,7 +1,10 @@
 #!/bin/bash
 
-CHAPTERS=72
 OUTNAME="mol.epub"
+
+CHAPTERS=`curl -s https://www.fictionpress.com/s/2961893 | grep 'option  value' | sed 's/option  value.\([0-9]*\)/xxxxx\1xxxxx\n/g' | grep -o 'xxxxx.*xxxxx' | sed 's/xxxxx\([0-9]*\)xxxxx/\1/' | sort -u -n | tail -n 1`
+
+echo $CHAPTERS > numchapters
 
 # create source dir if it doesn't exit
 if [[ ! -e source ]]; then
@@ -56,7 +59,7 @@ if [[ ! -e cleanmd ]]; then
 	mkdir cleanmd
 fi
 
-# remove div tags
+# remove div tags and rewrite chapter tag
 for x in `seq $CHAPTERS`
 do
     padded=`printf '%03d' $x`
