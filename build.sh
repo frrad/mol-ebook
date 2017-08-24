@@ -1,8 +1,9 @@
 #!/bin/bash
 
 OUTNAME="mol.epub"
+CURLFLAGS="--compressed"
 
-CHAPTERS=`curl -s https://www.fictionpress.com/s/2961893 | grep -o 'option  value=[0-9]*' | sed 's/^.*value=\([0-9]*\)*[^0-9]*$/\1/' | sort -unr | head -n 1`
+CHAPTERS=`curl $CURLFLAGS -s https://www.fictionpress.com/s/2961893 | grep -o 'option  value=[0-9]*' | sed 's/^.*value=\([0-9]*\)*[^0-9]*$/\1/' | sort -unr | head -n 1`
 
 echo $CHAPTERS > numchapters
 
@@ -18,7 +19,7 @@ do
     url="https://www.fictionpress.com/s/2961893/$x"
     if [[ ! -e $filename ]]; then
         echo "Downloading Chapter $x"
-		curl -o $filename $url
+		curl $CURLFLAGS -o $filename $url
     fi
 done
 
