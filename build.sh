@@ -69,6 +69,7 @@ do
     if [[ ! -e $output ]]; then
         echo "cleaning markdown: Chapter $x"
         grep -v '<' $input | sed 's/\*\*\(Chapter [0-9]*\)\*\*/#\1/' > $output
+        sed -i 's/- break -/-----/' $output
     fi
 done
 
