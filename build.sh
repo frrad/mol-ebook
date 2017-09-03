@@ -1,9 +1,10 @@
 #!/bin/bash
 
-OUTNAME="mol.epub"
 CURLFLAGS="--compressed"
-
 CHAPTERS=`curl $CURLFLAGS -s https://www.fictionpress.com/s/2961893 | grep -o 'option  value=[0-9]*' | sed 's/^.*value=\([0-9]*\)*[^0-9]*$/\1/' | sort -unr | head -n 1`
+OUTPREFIX="mol"
+OUTNAME="$OUTPREFIX-$CHAPTERS"
+TMP1="/tmp/tmp1"
 
 echo $CHAPTERS > numchapters
 
@@ -15,27 +16,11 @@ fi
 # check for undownloaded chapters
 for x in `seq $CHAPTERS`
 do
-    filename="source/$x"
+    filename="source/$x.html"
     url="https://www.fictionpress.com/s/2961893/$x"
     if [[ ! -e $filename ]]; then
         echo "Downloading Chapter $x"
 		curl $CURLFLAGS -o $filename $url
-    fi
-done
-
-# create stripped dir if it doesn't exit
-if [[ ! -e stripped ]]; then
-	mkdir stripped
-fi
-
-# strip headers and footers
-for x in `seq $CHAPTERS`
-do
-    input="source/$x"
-    output="stripped/$x.html"
-    if [[ ! -e $output ]]; then
-        echo "stripping headers/footers: Chapter $x"
-        grep "div class='storytext" $input > $output
     fi
 done
 
@@ -47,11 +32,13 @@ fi
 # reformat to markdown
 for x in `seq $CHAPTERS`
 do
-    input="stripped/$x.html"
+    input="source/$x.html"
     output="markdown/$x.md"
     if [[ ! -e $output ]]; then
+        echo "stripping headers/footers: Chapter $x"
+        grep "div class='storytext" $input > $TMP1
         echo "converting to markdown: Chapter $x"
-        pandoc $input -f html -t markdown -o $output
+        pandoc $TMP1 -f html -t markdown -o $output
     fi
 done
 
@@ -68,14 +55,42 @@ do
     output="cleanmd/$padded.md"
     if [[ ! -e $output ]]; then
         echo "cleaning markdown: Chapter $x"
-        grep -v '<' $input | sed 's/\*\*\(Chapter [0-9]*\)\*\*/#\1/' > $output
+
+        #chapter titles
+        grep -v '<' $input | sed ':a;N;$!ba;s/\*\*Chapter 0*\([1-9][0-9]*\)\*\*\n\n\*\*\([^\*]*\)\*\*/#\1. \2/g' > $output
+
+		#breaks
         sed -i 's/- break -/-----/' $output
+
+		# reformat
+		pandoc $output -o $TMP1
+		mv $TMP1 $output
     fi
 done
 
+# create cover dir if it doesn't exit
+if [[ ! -e cover ]]; then
+	mkdir cover
+fi
+if [[ ! -e cover/raw_cover.jpg ]]; then
+	echo "Fetching cover image"
+    curl -o cover/raw_cover.jpg http://i.imgur.com/z7W9gc7.jpg
+fi
+if [[ ! -e cover/cover.jpg ]]; then
+	echo "Resizing cover image"
+    convert cover/raw_cover.jpg -resize 600x800\! cover/cover.jpg
+fi
 
-echo 'building epub...'
-pandoc -S -o $OUTNAME title.txt `ls cleanmd/*md | sort -n` --toc
+# Produce epub if current doesn't exist
+if [[ ! -e ${OUTNAME}.epub ]]; then
+	# ask to remove old ones
+	rm -i $OUTPREFIX-*.epub
+	echo 'building epub...'
+	pandoc -S -o ${OUTNAME}.epub title.txt `ls cleanmd/*md | sort -n` --toc --epub-cover-image=cover/cover.jpg
+fi
 
-echo 'building mobi...'
-kindlegen $OUTNAME
+if [[ ! -e ${OUTNAME}.mobi ]]; then
+	rm -i $OUTPREFIX-*.mobi
+	echo 'building mobi...'
+	kindlegen ${OUTNAME}.epub
+fi
