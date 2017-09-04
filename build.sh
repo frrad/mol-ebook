@@ -94,8 +94,9 @@ if [[ ! -e ${OUTNAME}.mobi ]]; then
     echo 'building mobi...'
     kindlegen ${OUTNAME}.epub
 
-    # cd .. && git clone https://github.com/kevinhendricks/KindleUnpack.git
+    rm -i mobi7-$OUTPREFIX-*.mobi
     echo 'extracting mobi7...'
+    # cd .. && git clone https://github.com/kevinhendricks/KindleUnpack.git
     python ../KindleUnpack/lib/kindleunpack.py -s ${OUTNAME}.mobi
     cp ${OUTNAME}/mobi7-${OUTNAME}.mobi .
     rm -rf $OUTNAME
