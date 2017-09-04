@@ -10,7 +10,7 @@ echo $CHAPTERS > numchapters
 
 # create source dir if it doesn't exit
 if [[ ! -e source ]]; then
-	mkdir source
+    mkdir source
 fi
 
 # check for undownloaded chapters
@@ -20,13 +20,13 @@ do
     url="https://www.fictionpress.com/s/2961893/$x"
     if [[ ! -e $filename ]]; then
         echo "Downloading Chapter $x"
-		curl $CURLFLAGS -o $filename $url
+        curl $CURLFLAGS -o $filename $url
     fi
 done
 
 # create markdown dir if it doesn't exit
 if [[ ! -e markdown ]]; then
-	mkdir markdown
+    mkdir markdown
 fi
 
 # reformat to markdown
@@ -44,7 +44,7 @@ done
 
 # create cleanmd dir if it doesn't exit
 if [[ ! -e cleanmd ]]; then
-	mkdir cleanmd
+    mkdir cleanmd
 fi
 
 # remove div tags and rewrite chapter tag
@@ -59,38 +59,45 @@ do
         #chapter titles
         grep -v '<' $input | sed ':a;N;$!ba;s/\*\*Chapter 0*\([1-9][0-9]*\)\*\*\n\n\*\*\([^\*]*\)\*\*/#\1. \2/g' > $output
 
-		#breaks
+        #breaks
         sed -i 's/- break -/-----/' $output
 
-		# reformat
-		pandoc $output -o $TMP1
-		mv $TMP1 $output
+        # reformat
+        pandoc $output -o $TMP1
+        mv $TMP1 $output
     fi
 done
 
 # create cover dir if it doesn't exit
 if [[ ! -e cover ]]; then
-	mkdir cover
+    mkdir cover
 fi
 if [[ ! -e cover/raw_cover.jpg ]]; then
-	echo "Fetching cover image"
+    echo "Fetching cover image"
     curl -o cover/raw_cover.jpg http://i.imgur.com/z7W9gc7.jpg
 fi
 if [[ ! -e cover/cover.jpg ]]; then
-	echo "Resizing cover image"
-    convert cover/raw_cover.jpg -resize 600x800\! cover/cover.jpg
+    echo "Resizing cover image"
+    convert cover/raw_cover.jpg -resize 600x900\! cover/cover.jpg
 fi
 
 # Produce epub if current doesn't exist
 if [[ ! -e ${OUTNAME}.epub ]]; then
-	# ask to remove old ones
-	rm -i $OUTPREFIX-*.epub
-	echo 'building epub...'
-	pandoc -S -o ${OUTNAME}.epub title.txt `ls cleanmd/*md | sort -n` --toc --epub-cover-image=cover/cover.jpg
+    # ask to remove old ones
+    rm -i $OUTPREFIX-*.epub
+    echo 'building epub...'
+    pandoc -S -o ${OUTNAME}.epub title.txt `ls cleanmd/*md | sort -n` --toc --epub-cover-image=cover/cover.jpg
 fi
 
 if [[ ! -e ${OUTNAME}.mobi ]]; then
-	rm -i $OUTPREFIX-*.mobi
-	echo 'building mobi...'
-	kindlegen ${OUTNAME}.epub
+    rm -i $OUTPREFIX-*.mobi
+    echo 'building mobi...'
+    kindlegen ${OUTNAME}.epub
+
+    # cd .. && git clone https://github.com/kevinhendricks/KindleUnpack.git
+    echo 'extracting mobi7...'
+    python ../KindleUnpack/lib/kindleunpack.py -s ${OUTNAME}.mobi
+    cp ${OUTNAME}/mobi7-${OUTNAME}.mobi .
+    rm -rf $OUTNAME
 fi
+

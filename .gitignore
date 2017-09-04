@@ -1,7 +1,7 @@
 cleanmd/*
 markdown/*
 source/*
-stripped/*
+cover/*
 
-mol.epub
-mol.mobi
+*.epub
+*.mobi
