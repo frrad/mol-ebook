@@ -4,7 +4,7 @@ Deps: kindleunpack
 
 Dependencies:
 ``` shell
-sudo apt-cache search pandoc                       # to reformat html
+sudo apt install pandoc                            # to reformat html
 sudo apt install graphicsmagick-imagemagick-compat # to resize cover art
 
 # to get mobi from epub
