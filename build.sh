@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CURLFLAGS="--compressed"
-CHAPTERS=`curl $CURLFLAGS -s https://www.fictionpress.com/s/2961893 | grep -o 'option  value=[0-9]*' | sed 's/^.*value=\([0-9]*\)*[^0-9]*$/\1/' | sort -unr | head -n 1`
+CHAPTERS="108"
 OUTPREFIX="mol"
 OUTNAME="$OUTPREFIX-$CHAPTERS"
 TMP1="/tmp/tmp1"
